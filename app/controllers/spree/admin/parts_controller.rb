@@ -1,21 +1,18 @@
 class Spree::Admin::PartsController < Spree::Admin::BaseController
-#  helper :products
-  before_filter :find_product
+  helper_method :product
 
   def index
-    @parts = @product.parts
+    @parts = product.assemblies_parts
   end
 
   def remove
-    @part = Spree::Variant.find(params[:id])
-    @product.remove_part(@part)
-    render :template => 'spree/admin/parts/update_parts_table'
+    assembly_part = Spree::AssembliesPart.find(params[:id])
+    assembly_part.destroy
+    render 'spree/admin/parts/update_parts_table'
   end
 
   def set_count
-    @part = Spree::Variant.find(params[:id])
-    @product.set_part_count(@part, params[:count].to_i)
-    render :template => 'spree/admin/parts/update_parts_table'
+    save_part(existing_part_params)
   end
 
   def available
@@ -23,8 +20,7 @@ class Spree::Admin::PartsController < Spree::Admin::BaseController
       @available_products = []
     else
       query = "%#{params[:q]}%"
-      @available_products = Spree::Product.not_deleted.available.joins(:master).where("(spree_products.name #{LIKE} ? OR spree_variants.sku #{LIKE} ?) AND can_be_part = ?", query, query, true).limit(30)
-      
+      @available_products = Spree::Product.search_can_be_part(query)
       @available_products.uniq!
     end
     respond_to do |format|
@@ -34,14 +30,34 @@ class Spree::Admin::PartsController < Spree::Admin::BaseController
   end
 
   def create
-    @part = Spree::Variant.find(params[:part_id])
-    qty = params[:part_count].to_i
-    @product.add_part(@part, qty) if qty > 0
-    render :template => 'spree/admin/parts/update_parts_table'
+    save_part(new_part_params)
   end
 
   private
-    def find_product
-      @product = Spree::Product.find_by_permalink(params[:product_id])
+
+    def save_part(part_params)
+      form = Spree::AssignPartToBundleForm.new(product, part_params)
+      if form.submit
+        render 'spree/admin/parts/update_parts_table'
+      else
+        error_message = form.errors.full_messages.to_sentence
+        render json: error_message.to_json, status: 422
+      end
+    end
+
+    def product
+      @product ||= Spree::Product.find_by(slug: params[:product_id])
+    end
+
+    def new_part_params
+      params.require(:assemblies_part).permit(
+        :count,
+        :variant_id,
+        :variant_selection_deferred
+      )
+    end
+
+    def existing_part_params
+      params.permit(:id, :count)
     end
 end

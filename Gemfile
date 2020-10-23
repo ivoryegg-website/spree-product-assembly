@@ -1,6 +1,9 @@
-source "http://rubygems.org"
+source "https://rubygems.org"
+
+branch = '3-0-stable'
+gem 'spree', github: 'spree/spree', branch: branch
+gem 'spree_wombat', github: 'spree/spree_wombat', branch: branch
+
+gem 'pry-rails'
 
 gemspec
-
-gem 'spree', '1.0.0'
-gem 'sqlite3'

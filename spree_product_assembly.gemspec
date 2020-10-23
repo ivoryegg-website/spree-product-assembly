@@ -1,24 +1,33 @@
 Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.name        = 'spree_product_assembly'
-  s.version     = '1.0.0'
+  s.version     = '3.0.1'
   s.summary     = 'Adds oportunity to make bundle of products to your Spree store'
-  s.description = 'Adds oportunity to make bundle of products to your Spree store'
-  s.required_ruby_version = '>= 1.8.7'
+  s.description = s.summary
+  s.required_ruby_version = '>= 2.1.0'
 
   s.author            = 'Roman Smirnov'
-  s.email             = 'roman@railsdog.com'
-  s.homepage          = 'https://github.com/spree/spree-product-assembly'
-  # s.rubyforge_project = 'actionmailer'
+  s.email             = 'POMAHC@gmail.com'
+  s.homepage          = 'https://github.com/spree-contrib/spree-product-assembly'
 
   s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
+  s.test_files    = `git ls-files -- spec/*`.split("\n")
   s.require_path = 'lib'
   s.requirements << 'none'
 
-  s.add_dependency('spree', '~> 1.0')
-  
-  s.add_development_dependency 'rspec-rails',  '~> 2.7'
+  s.add_dependency 'spree_backend', '~> 3.0'
+
+  s.add_development_dependency 'active_model_serializers', '0.9.0.alpha1'
+  s.add_development_dependency 'capybara', '~> 2.4'
+  s.add_development_dependency 'coffee-rails', '~> 4.0.0'
+  s.add_development_dependency 'database_cleaner', '~> 1.4'
+  s.add_development_dependency 'factory_girl', '~> 4.4'
+  s.add_development_dependency 'ffaker'
+  s.add_development_dependency 'launchy'
+  s.add_development_dependency 'pg'
+  s.add_development_dependency 'poltergeist', '~> 1.6'
+  s.add_development_dependency 'rspec-rails', '~> 3.3.0'
+  s.add_development_dependency 'sass-rails', '~> 4.0.0'
+  s.add_development_dependency 'simplecov'
   s.add_development_dependency 'sqlite3'
-  s.add_development_dependency 'factory_girl', '~> 2.6'
 end

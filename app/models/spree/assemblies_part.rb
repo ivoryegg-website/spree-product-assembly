@@ -1,19 +1,33 @@
-class Spree::AssembliesPart < ActiveRecord::Base
-  #set_primary_keys :assembly_id, :part_id
-  belongs_to :assembly, :class_name => "Spree::Product", :foreign_key => "assembly_id"
-  belongs_to :part, :class_name => "Spree::Variant", :foreign_key => "part_id"
+module Spree
+  class AssembliesPart < ActiveRecord::Base
+    belongs_to :assembly, class_name: "Spree::Product",
+                          foreign_key: "assembly_id",
+                          touch: true
 
-  def self.get(assembly_id, part_id)
-    Spree::AssembliesPart.find_by_assembly_id_and_part_id(assembly_id, part_id)
+    belongs_to :part, class_name: "Spree::Variant", foreign_key: "part_id"
+
+    delegate :name, :sku, to: :part
+
+    after_create :set_master_unlimited_stock
+
+    def self.get(assembly_id, part_id)
+      find_or_initialize_by(assembly_id: assembly_id, part_id: part_id)
+    end
+
+    def options_text
+      if variant_selection_deferred?
+        Spree.t(:user_selectable)
+      else
+        part.options_text
+      end
+    end
+
+    private
+
+    def set_master_unlimited_stock
+      if part.product.variants.any?
+        part.product.master.update_attribute :track_inventory, false
+      end
+    end
   end
-
-  def save
-    Spree::AssembliesPart.update_all("count = #{count}", 
-        ["assembly_id = ? AND part_id = ?", assembly_id, part_id])
-  end
-
-  def destroy
-    Spree::AssembliesPart.delete_all(["assembly_id = ? AND part_id = ?", assembly_id, part_id])
-  end
-
 end
