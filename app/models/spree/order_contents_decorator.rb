@@ -32,8 +32,9 @@ module Spree
       end
     end
 
-    alias_method_chain :add_to_line_item, :parts
-
+    alias_method :add_to_line_item_without_parts, :add_to_line_item
+    alias_method :add_to_line_item, :add_to_line_item_with_parts
+    
     private
 
     def part_variants_match?(line_item, variant, quantity, options)
