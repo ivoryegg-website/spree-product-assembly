@@ -21,7 +21,7 @@ class Spree::Admin::PartsController < Spree::Admin::BaseController
     else
       query = "%#{params[:q]}%"
       @available_products = Spree::Product.search_can_be_part(query)
-      @available_products.uniq!
+      @available_products.distinct!
     end
     respond_to do |format|
       format.html {render :layout => false}
